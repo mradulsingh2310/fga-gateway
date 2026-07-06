@@ -10,13 +10,24 @@ tests validate authorization behavior, and every allow/deny is auditable.
 
 ## Current Status
 
-This repository currently contains product requirements documents, an initial
-OpenFGA model layout, and the initial OSS project shell. Implementation has not
-started yet.
+This repository contains the initial Spring Boot gateway skeleton:
+
+- `POST /v1/preflight` authorization decision API
+- fail-closed default FGA check client for unconfigured local startup
+- OpenFGA modular model and `.fga.yaml` tests
+- focused unit, MVC, and startup tests
 
 ## PRDs
 
 - [fga-gateway PRD](docs/prd/fga-gateway.md)
+
+## Development Checks
+
+```bash
+mvn test
+fga model validate --file fga/fga.mod
+fga model test --tests fga/tests/agent-tool-tests.fga.yaml
+```
 
 ## License
 
