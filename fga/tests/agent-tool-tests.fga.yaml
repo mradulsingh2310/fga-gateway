@@ -1,0 +1,20 @@
+name: Agent tool authorization tests
+model_file: ../fga.mod
+tuple_file: tuples/common-tuples.yaml
+tests:
+  - name: user can view target and support agent can invoke tool
+    check:
+      - user: user:alice
+        object: resource:ticket_1
+        assertions:
+          can_view: true
+          can_edit: false
+      - user: user:admin
+        object: resource:ticket_1
+        assertions:
+          can_view: true
+          can_edit: true
+      - user: agent:support
+        object: tool:github_issue_update
+        assertions:
+          can_invoke: true

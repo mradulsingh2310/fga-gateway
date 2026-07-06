@@ -1,0 +1,21 @@
+module core
+
+type tenant
+  relations
+    define member: [user]
+    define admin: [user]
+
+type user
+
+type agent
+  relations
+    define tenant: [tenant]
+    define operator: [user]
+
+type resource
+  relations
+    define tenant: [tenant]
+    define viewer: [user] or member from tenant
+    define editor: [user] or admin from tenant
+    define can_view: viewer or editor
+    define can_edit: editor

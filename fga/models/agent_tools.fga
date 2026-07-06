@@ -1,0 +1,7 @@
+module agent_tools
+
+type tool
+  relations
+    define tenant: [tenant]
+    define allowed_agent: [agent]
+    define can_invoke: allowed_agent
