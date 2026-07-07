@@ -271,7 +271,81 @@ Integration requirements:
 - fail-closed behavior for protected tools
 - decision ID stored in agentctl tool-call projection
 
-## 14. Milestones
+## 14. Current Implementation Gap Audit
+
+As of 2026-07-07, the repository contains:
+
+- Spring Boot project shell.
+- `POST /v1/preflight` controller.
+- Preflight decision service that checks user access and agent `can_invoke`.
+- Fail-closed default check client for unconfigured local startup.
+- Modular OpenFGA model files under `fga/`.
+- A minimal `.fga.yaml` model test.
+- Unit, MVC, and startup tests for the current preflight skeleton.
+
+The following PRD requirements are still missing and must be planned before
+claiming v1 completeness:
+
+### 14.1 OpenFGA Model Gaps
+
+- Add `tool_group` and `session` types.
+- Add `can_create`, `can_delete`, and `can_proxy` permissions.
+- Model tenant boundary checks for user, agent, tool, and target resource in one
+  authorization story.
+- Add negative `.fga.yaml` cases for wrong tenant, wrong agent, unknown tool,
+  denied relation, and proxy denial.
+- Add CI workflow steps for `fga model validate --file fga/fga.mod` and
+  `fga model test --tests fga/tests/agent-tool-tests.fga.yaml`.
+
+### 14.2 Preflight API Gaps
+
+- Request is missing `sessionId`, `toolVersion`, and `correlationId`.
+- Response is missing `decisionId`, checks performed, cache status, audit status,
+  model ID, and manifest version.
+- No request validation for malformed tenant, resource type, resource ID, tool
+  name, relation, or cross-tenant identifiers.
+- Unknown tools are not denied through a manifest because no manifest is loaded.
+- Current check client is only a fail-closed stub, not a real OpenFGA client.
+
+### 14.3 Manifest Gaps
+
+- No Python decorator package.
+- No manifest schema.
+- No manifest generation.
+- No Java manifest loader.
+- No Java manifest validator.
+- No startup/registration path that denies unknown or malformed tools.
+- No manifest version in cache keys, audit rows, or decision responses.
+
+### 14.4 Proxy Mode Gaps
+
+- No HTTP/MCP proxy controller or filter.
+- No upstream forwarding.
+- No request metadata extraction.
+- No trace propagation through proxy mode.
+- No fail-closed behavior for proxy extraction failures because proxy mode does
+  not exist yet.
+
+### 14.5 Audit, Cache, Auth, And Observability Gaps
+
+- No audit table or audit writer.
+- No persisted allow/deny decisions.
+- No decision query API.
+- No decision cache.
+- No cache invalidation on manifest version changes.
+- No service-token validation for local dev or service-to-service calls.
+- No OTel spans or metrics for decisions, checks, cache, audit, or proxy.
+- No OpenFGA model ID capture.
+
+### 14.6 agentctl Integration Gaps
+
+- `agentctl` does not call `fga-gateway` yet.
+- `agentctl` has no `fga_decision_id` populated from real gateway responses.
+- Support-ticket fake/GitHub tools are not protected by preflight checks yet.
+- There is no shared contract fixture between `agentctl` tool calls and
+  `fga-gateway` preflight requests.
+
+## 15. Milestones
 
 M0: Repo and PRD
 
@@ -297,7 +371,7 @@ M5: agentctl Integration
 
 - Authorize support-ticket fake and GitHub issue tools.
 
-## 15. Acceptance Criteria
+## 16. Acceptance Criteria
 
 - Unauthorized tool call is denied before execution.
 - Deny decision is persisted in audit store.
